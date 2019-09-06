@@ -20,10 +20,16 @@ void printPr(std::unordered_map<std::string,std::vector<std::vector<std::string>
     }
 }
 
-std::unordered_set<std::string> LLParser::First(const std::string &a){
+std::unordered_set<std::string> LLParser::_First(const std::string &a,std::unordered_map<std::string,std::unordered_set<std::string> > &m){
     std::unordered_set<std::string> ret;
+    if (m.count(a)) {
+        return m[a];
+    }
     if (Terminals.count(a)) {
         ret.insert(a);
+        if (!m.count(a)) {
+            m.insert(std::make_pair(a,ret));
+        }
         return ret;
     }
     for(auto i:pr[a]){  //遍历每个产生式
@@ -35,7 +41,8 @@ std::unordered_set<std::string> LLParser::First(const std::string &a){
         for(auto j:i){
             std::unordered_set<std::string> n;
             if (add) {
-                n=First(j);
+                n=_First(j,m);
+                
                 if (!n.count("ε")) {
                     add=false;
                 }
@@ -48,6 +55,14 @@ std::unordered_set<std::string> LLParser::First(const std::string &a){
         }
 
     }
+    if (!m.count(a)) {
+        m.insert(std::make_pair(a,ret));
+    }
     return ret;
-    
 } 
+
+std::unordered_set<std::string> LLParser::First(const std::string& a){
+    
+    auto i=_First(a,firstMap);
+    return i;
+}

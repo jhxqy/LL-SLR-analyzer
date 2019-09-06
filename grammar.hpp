@@ -21,8 +21,11 @@ class LLParser{
     std::unordered_set<std::string> Terminals;
     std::unordered_set<std::string> nonTerminals;
     std::unordered_map<std::string,std::vector<std::vector<std::string>>> pr;
+    std::unordered_map<std::string,std::unordered_set<std::string> > firstMap;
     
 public:
+    std::unordered_set<std::string> _First(const std::string&,std::unordered_map<std::string,std::unordered_set<std::string> > &m);
+    
     std::unordered_set<std::string> First(const std::string&);
     LLParser(std::basic_istream<char> &ss,std::unordered_set<std::string> t):Terminals(t){
         std::string tmp;
