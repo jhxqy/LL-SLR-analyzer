@@ -65,7 +65,29 @@ int main(int argc, const char * argv[]) {
 //            }
 //        }
 //    }
-    LLParser ll(cin,Terminals);
+    
+    /*
+     RegexList -> Regex RegexList|ε
+     Regex     -> term R'
+     R'        -> + term R'|ε
+     term      -> factor T'
+     T'        -> *|ε
+     factor    -> (RegexList)|STR|CHAR
+     */
+    
+
+    stringstream ss;
+    ss<<"RegexList -> Regex RegexList | ε"<<endl;
+    ss<<"Regex -> term R'"<<endl;
+    ss<<"R' -> + term R' | ε"<<endl;
+    ss<<"term -> factor T'"<<endl;
+    ss<<"T' -> * | ε"<<endl;
+    ss<<"factor -> ( RegexList ) | STR | CHAR"<<endl;
+    LLParser ll(ss,unordered_set<string>{"ε","STR","CHAR","(",")","*","+"});
+    auto i=ll.First("RegexList");
+    auto j=ll.First("Regex");
+    cout<<endl;
+    
     
     return 0;
 }

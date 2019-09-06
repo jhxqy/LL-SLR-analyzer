@@ -26,8 +26,9 @@ std::unordered_set<std::string> LLParser::First(const std::string &a){
         ret.insert(a);
         return ret;
     }
-    bool add=true;
     for(auto i:pr[a]){  //遍历每个产生式
+        bool add=true;
+
         if (i.size()==1&&!i[0].compare("ε")) {
             ret.insert("ε");
         }
@@ -38,11 +39,11 @@ std::unordered_set<std::string> LLParser::First(const std::string &a){
                 if (!n.count("ε")) {
                     add=false;
                 }
-                for(auto i=n.begin();i!=n.end();i++){
-                    ret.insert(*i);
+                for(auto k=n.begin();k!=n.end();k++){
+                    ret.insert(*k);
                 }
             }else{
-                break;
+                
             }
         }
 
