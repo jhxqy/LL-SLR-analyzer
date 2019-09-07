@@ -22,11 +22,35 @@ class LLParser{
     std::unordered_set<std::string> nonTerminals;
     std::unordered_map<std::string,std::vector<std::vector<std::string>>> pr;
     std::unordered_map<std::string,std::unordered_set<std::string> > firstMap;
-    
-public:
+    std::unordered_map<std::string,std::unordered_set<std::string>> followMap;
+    void _Follow(const std::string &start);
     std::unordered_set<std::string> _First(const std::string&,std::unordered_map<std::string,std::unordered_set<std::string> > &m);
+
+public:
     
     std::unordered_set<std::string> First(const std::string&);
+    std::unordered_set<std::string> Follow(const std::string& start){
+        static bool finish=false;
+        if(finish){
+            return followMap[start];
+        }
+        int count=0,n=0;
+        for(auto i:followMap){
+            n+=i.second.size();
+        }
+        do{
+            count=n;
+            _Follow(start);
+            n=0;
+            for(auto i:followMap){
+                n+=i.second.size();
+            }
+        }while(count!=n);
+        finish=true;
+        return Follow(start);
+    } 
+
+    
     LLParser(std::basic_istream<char> &ss,std::unordered_set<std::string> t):Terminals(t){
         std::string tmp;
         while (std::getline(ss,tmp)) {
@@ -61,7 +85,8 @@ public:
 
         }
     }
-    
+    void PrintAllFollow();
+    void PrintAllFirst();
 };
 
 #endif /* grammar_hpp */

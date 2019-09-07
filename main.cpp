@@ -23,49 +23,8 @@ unordered_map<std::string,vector<vector<string>>> pr;
 
 // @代替
 int main(int argc, const char * argv[]) {
-//    cout<<"请输入终结符号,结束输入end:"<<endl;
-//    while (cin>>tmp) {
-//        if (!tmp.compare("end")) {
-//            break;
-//        }
-//        if (Terminals.count(tmp)<1) {
-//            Terminals.insert(std::move(tmp));
-//        }
-//    }
-    //    string tmp;
-//
-//    cout<<"请输入生成式,结束输入end:"<<endl;
-//    while (getline(cin,tmp)) {
-//        if (tmp.empty()) {
-//            continue;
-//        }
-//        if (!tmp.compare("end")) {
-//            break;
-//        }
-//        vector<string> v;
-//        StringUtils::Split(tmp, v, ' ');
-//        if (pr.count(v[0])==0) {
-//            pr[v[0]]=vector<vector<string>>();
-//
-//        }
-//        nonTerminals.insert(v[0]);
-//        vector<string> expr;
-//        for (int i=2;i<v.size();i++){
-//            if (!v[i].compare("|")) {
-//                pr[v[0]].push_back(expr);
-//                expr.clear();
-//            }else{
-//                if (!Terminals.count(v[i])&&!nonTerminals.count(v[i])) {
-//                    nonTerminals.insert(v[i]);
-//                }
-//                expr.push_back(v[i]);
-//                if (i==v.size()-1) {
-//                    pr[v[0]].push_back(expr);
-//                }
-//            }
-//        }
-//    }
-    
+    stringstream ss;
+
     /*
      RegexList -> Regex RegexList|ε
      Regex     -> term R'
@@ -76,18 +35,34 @@ int main(int argc, const char * argv[]) {
      */
     
 
-    stringstream ss;
+    /*
     ss<<"RegexList -> Regex RegexList | ε"<<endl;
     ss<<"Regex -> term R'"<<endl;
     ss<<"R' -> + term R' | ε"<<endl;
     ss<<"term -> factor T'"<<endl;
     ss<<"T' -> * | ε"<<endl;
     ss<<"factor -> ( RegexList ) | STR | CHAR"<<endl;
-    LLParser ll(ss,unordered_set<string>{"ε","STR","CHAR","(",")","*","+"});
-    auto i=ll.First("RegexList");
-    auto j=ll.First("Regex");
+     */
+    
+    
+    /*
+     E -> T E'
+     E' -> + T E' | ε
+     T -> F T'
+     T' -> * F T' | ε
+     F -> ( E ) | id
+     */
+    ss<<"E -> T E'"<<endl;
+    ss<<"E' -> + T E' | ε"<<endl;
+    ss<<"T -> F T'"<<endl;
+    ss<<"T' -> * F T' | ε"<<endl;
+    ss<<"F -> ( E ) | id"<<endl;
+    LLParser ll(ss,unordered_set<string>{"ε","id","(",")","*","+"});
+    auto i=ll.First("F");
+    auto j=ll.First("E");
+    auto k=ll.First("T");
+    ll.PrintAllFollow();
     cout<<endl;
-    
-    
+    ll.PrintAllFirst();
     return 0;
 }

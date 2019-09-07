@@ -66,3 +66,58 @@ std::unordered_set<std::string> LLParser::First(const std::string& a){
     auto i=_First(a,firstMap);
     return i;
 }
+
+
+void LLParser::_Follow(const std::string &start){
+    if (!followMap.count(start)) {
+        followMap.insert(std::make_pair(start,std::unordered_set<std::string>()));
+        followMap[start].insert("$");
+    }
+    
+    for(auto CA:pr){
+        for(auto eachCA:CA.second){
+            for (int i=0; i<eachCA.size(); i++) {
+                if (nonTerminals.count(eachCA[i])) {
+                    if (i!=eachCA.size()-1) {
+                        for (auto x:First(eachCA[i+1])) {
+                            if (x!="ε") {
+                                followMap[eachCA[i]].insert(x);
+                            }else if(i==eachCA.size()-2){
+                                for(auto c:followMap[CA.first]){
+                                    followMap[eachCA[i]].insert(c);
+                                }
+                            }
+                        }
+                    }else{
+                        for(auto c:followMap[CA.first]){
+                            followMap[eachCA[i]].insert(c);
+                        }
+                    }
+                    
+                }else{
+                    
+                }
+            }
+        }
+    }
+    
+}
+void LLParser::PrintAllFollow(){
+    for(auto i:nonTerminals){
+        std::cout<<i<<":";
+        for(auto j:Follow(i)){
+            std::cout<<j<<" ";
+        }
+        std::cout<<std::endl;
+    }
+}
+
+void LLParser::PrintAllFirst(){
+    for(auto i:nonTerminals){
+        std::cout<<i<<":";
+        for(auto j:First(i)){
+            std::cout<<j<<" ";
+        }
+        std::cout<<std::endl;
+    }
+}
