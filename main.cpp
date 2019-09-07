@@ -16,11 +16,6 @@
 using namespace std;
 using namespace JSTR;
 
-unordered_set<string> Terminals{"ε","a","b","c","d"};
-unordered_set<string> nonTerminals;
-
-unordered_map<std::string,vector<vector<string>>> pr;
-
 // @代替
 int main(int argc, const char * argv[]) {
     stringstream ss;
@@ -58,11 +53,9 @@ int main(int argc, const char * argv[]) {
     ss<<"T' -> * F T' | ε"<<endl;
     ss<<"F -> ( E ) | id"<<endl;
     LLParser ll(ss,unordered_set<string>{"ε","id","(",")","*","+"});
-    auto i=ll.First("F");
-    auto j=ll.First("E");
-    auto k=ll.First("T");
     ll.PrintAllFollow();
     cout<<endl;
     ll.PrintAllFirst();
+    
     return 0;
 }
