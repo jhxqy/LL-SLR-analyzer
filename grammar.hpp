@@ -16,6 +16,7 @@
 #include <vector>
 #include <unordered_map>
 #include <string>
+#include <map>
 void printPr(std::unordered_map<std::string,std::vector<std::vector<std::string>>> &p);
 class LLParser{
     std::unordered_set<std::string> Terminals;
@@ -87,6 +88,8 @@ public:
     }
     void PrintAllFollow();
     void PrintAllFirst();
+    
+    std::map<std::string,std::map<std::string,std::string>> M();
 };
 
 #endif /* grammar_hpp */

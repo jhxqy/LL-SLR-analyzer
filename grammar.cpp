@@ -121,3 +121,21 @@ void LLParser::PrintAllFirst(){
         std::cout<<std::endl;
     }
 }
+std::map<std::string,std::map<std::string,std::string>> LLParser::M(){
+    std::map<std::string,std::map<std::string,std::string>> m;
+    for(auto i:nonTerminals){
+        for(auto j:Terminals){
+            if (j!="ε") {
+                std::map<std::string,std::string> sub;
+                sub.insert(std::make_pair(j, ""));
+                m.insert(std::make_pair(i, sub));
+            }
+            
+        }
+        std::map<std::string,std::string> sub;
+        sub.insert(std::make_pair("$", ""));
+        m.insert(std::make_pair(i, sub));
+    }
+    
+}
+
