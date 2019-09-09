@@ -52,10 +52,12 @@ int main(int argc, const char * argv[]) {
     ss<<"T -> F T'"<<endl;
     ss<<"T' -> * F T' | ε"<<endl;
     ss<<"F -> ( E ) | id"<<endl;
-    LLParser ll(ss,unordered_set<string>{"ε","id","(",")","*","+"});
+    LLParser ll("E",ss,unordered_set<string>{"ε","id","(",")","*","+"});
     ll.PrintAllFollow();
     cout<<endl;
     ll.PrintAllFirst();
+    cout<<endl;
+    ll.PrintTable();
     
     return 0;
 }

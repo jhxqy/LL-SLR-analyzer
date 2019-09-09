@@ -7,6 +7,42 @@
 //
 
 #include "grammar.hpp"
+LLParser::LLParser(const std::string &startSymbol_,std::basic_istream<char> &ss,std::unordered_set<std::string> t):startSymbol(startSymbol_),Terminals(t){
+    std::string tmp;
+    while (std::getline(ss,tmp)) {
+        if (tmp.empty()) {
+            continue;
+        }
+        if (!tmp.compare("end")) {
+            break;
+        }
+        std::vector<std::string> v;
+        JSTR::StringUtils::Split(tmp, v, ' ');
+        if (pr.count(v[0])==0) {
+            pr[v[0]]=std::vector<std::vector<std::string>>();
+            
+        }
+        nonTerminals.insert(v[0]);
+        std::vector<std::string> expr;
+        for (int i=2;i<v.size();i++){
+            if (!v[i].compare("|")) {
+                pr[v[0]].push_back(expr);
+                expr.clear();
+            }else{
+                if (!Terminals.count(v[i])&&!nonTerminals.count(v[i])) {
+                    nonTerminals.insert(v[i]);
+                }
+                expr.push_back(v[i]);
+                if (i==v.size()-1) {
+                    pr[v[0]].push_back(expr);
+                }
+            }
+        }
+        
+    }
+}
+
+
 void printPr(std::unordered_map<std::string,std::vector<std::vector<std::string>>> &p){
     using namespace std;
     for(auto expr:p){
@@ -60,20 +96,60 @@ std::unordered_set<std::string> LLParser::_First(const std::string &a,std::unord
     }
     return ret;
 } 
+std::unordered_set<std::string> LLParser::Follow(const std::string& start){
+    static bool finish=false;
+    if(finish){
+        return followMap[start];
+    }
+    int count=0,n=0;
+    for(auto i:followMap){
+        n+=i.second.size();
+    }
+    do{
+        count=n;
+        _Follow(startSymbol);
+        n=0;
+        for(auto i:followMap){
+            n+=i.second.size();
+        }
+    }while(count!=n);
+    finish=true;
+    return Follow(start);
+}
 
 std::unordered_set<std::string> LLParser::First(const std::string& a){
-    
     auto i=_First(a,firstMap);
     return i;
 }
-
-
+std::unordered_set<std::string> LLParser::First(const std::vector<std::string> &v){
+    std::unordered_set<std::string> res;
+    for(auto i:v){
+        if (Terminals.count(i)) {
+            res.insert(i);
+            break;
+        }else{
+            std::unordered_set<std::string> f=First(i);
+            bool br=true;
+            for(auto j:f){
+                if (!j.compare("ε")) {
+                    br=false;
+                    continue;
+                }else{
+                    res.insert(j);
+                }
+            }
+            if (br) {
+                break;
+            }
+        }
+    }
+    return res;
+}
 void LLParser::_Follow(const std::string &start){
     if (!followMap.count(start)) {
         followMap.insert(std::make_pair(start,std::unordered_set<std::string>()));
         followMap[start].insert("$");
     }
-    
     for(auto CA:pr){
         for(auto eachCA:CA.second){
             for (int i=0; i<eachCA.size(); i++) {
@@ -121,21 +197,57 @@ void LLParser::PrintAllFirst(){
         std::cout<<std::endl;
     }
 }
-std::map<std::string,std::map<std::string,std::string>> LLParser::M(){
-    std::map<std::string,std::map<std::string,std::string>> m;
-    for(auto i:nonTerminals){
-        for(auto j:Terminals){
-            if (j!="ε") {
-                std::map<std::string,std::string> sub;
-                sub.insert(std::make_pair(j, ""));
-                m.insert(std::make_pair(i, sub));
+JSTR::String2Array<std::string> LLParser::M(){
+    auto t2=Terminals;
+    t2.erase("ε");
+    t2.insert("$");
+    JSTR::String2Array<std::string> res(nonTerminals,t2);
+    for(auto i:pr){
+        for(auto j:i.second){
+            auto firstA=First(j);
+            bool fe=false;
+            bool me=false;
+            std::string Expr=i.first+" -> ";
+            for(auto k:j){
+                Expr.append(k);
             }
-            
+            for(auto k:firstA){
+                if (!k.compare("ε")) {
+                    auto followA=Follow(i.first);
+                    for(auto fa:followA){
+                        if(!fa.compare("$")){
+                            res[i.first]["$"]=Expr;
+                        }else{
+                            res[i.first][fa]=Expr;
+                        }
+                        
+                    }
+                    fe=true;
+                }else{
+                    res[i.first][k]=Expr;
+                }
+            }
         }
-        std::map<std::string,std::string> sub;
-        sub.insert(std::make_pair("$", ""));
-        m.insert(std::make_pair(i, sub));
+    }
+    return res;
+    
+
+}
+
+
+void LLParser::PrintTable(){
+    using namespace std;
+    auto m=M();
+    for(auto i:m.Key2s()){
+        cout<<"\t\t"<<i<<"  ";
+    }
+    cout<<endl;
+    for(auto i:m.Key1s()){
+        cout<<i<<"\t";
+        for(auto j:m.Key2s()){
+            cout<<m[i][j]<<"  ";
+        }
+        cout<<endl;
     }
     
 }
-
