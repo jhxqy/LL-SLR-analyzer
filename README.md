@@ -26,7 +26,7 @@ LL(1)的文法分析器
  
  F -> ( E ) | id
 
- ```
+ ```cpp
     stringstream ss;
     ss<<"E -> T E'"<<endl;
     ss<<"E' -> + T E' | ε"<<endl;
@@ -36,12 +36,12 @@ LL(1)的文法分析器
     LLParser ll("E",ss,unordered_set<string>{"ε","id","(",")","*","+"});
  ```
  使用输入流，输入文法，文法符号之间使用空格间隔
-```
+```cpp
 LLParser(const std::string &,std::basic_istream<char> &,std::unordered_set<std::string>);
 
 ```
 构造函数参数分别为 开始符号，文法输入流，终结符号集合。
-```
+```cpp
 //打印FOLLOW集合
 
 void LLParser::PrintAllFollow();
@@ -55,7 +55,7 @@ E:$ )
 ```
 
 
-```
+```cpp
 //打印FIRST集合
 
 void LLParser::PrintAllFirst();
@@ -67,17 +67,16 @@ T':ε *
 E':ε + 
 E:id (
 ```
-```
+```cpp
 //打印预测分析表
 
 void LLParser::PrintTable();
 ```
-```
 
-		$  	    	*   	  	(  	    	id      		)  	    	+  
-F	                          F -> (E)    F -> id      
-T	                          T -> FT'    T -> FT'      
-T'	T' -> ε     T' -> *FT'                                T' -> ε    T' -> ε  
-E'	E' -> ε                                               E' -> ε    E' -> +TE'  
-E	                          E -> TE'    E -> TE'      
-```
+| | $ | * | ( | id | ) | + |
+----|------|----------|---------|------|------|------|
+F |   |   | F -> (E) | F -> id |  |  
+T |   |   | T -> FT' | T -> FT' |  |  
+T' | T' -> ε  | T' -> *FT'  |  | T' -> ε | T' -> ε |  
+E |   |   | E -> TE' | E -> TE' |  |  
+E' | E' -> ε  |   |  |  | E' -> ε |  E' -> +TE'
