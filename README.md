@@ -13,3 +13,71 @@ LL(1)的文法分析器
 > 不断应用以下规则，直到没有新的终结符号被加入到任何FOLLOW集合中为止。
 1. 将$放到FOLLOW(S)中，其中S是开始符号，而$是输入右端的结束标记。
 2. 
+
+## 演示
+### 文法
+ E -> T E
+
+ E' -> + T E' | ε 
+
+ T -> F T'
+
+ T' -> * F T' | ε
+ 
+ F -> ( E ) | id
+
+ ```
+    stringstream ss;
+    ss<<"E -> T E'"<<endl;
+    ss<<"E' -> + T E' | ε"<<endl;
+    ss<<"T -> F T'"<<endl;
+    ss<<"T' -> * F T' | ε"<<endl;
+    ss<<"F -> ( E ) | id"<<endl;
+    LLParser ll("E",ss,unordered_set<string>{"ε","id","(",")","*","+"});
+ ```
+ 使用输入流，输入文法，文法符号之间使用空格间隔
+```
+LLParser(const std::string &,std::basic_istream<char> &,std::unordered_set<std::string>);
+
+```
+构造函数参数分别为 开始符号，文法输入流，终结符号集合。
+```
+//打印FOLLOW集合
+
+void LLParser::PrintAllFollow();
+```
+```
+F:* $ ) + 
+T:+ ) $ 
+T':$ ) + 
+E':) $ 
+E:$ )
+```
+
+
+```
+//打印FIRST集合
+
+void LLParser::PrintAllFirst();
+```
+```
+F:id ( 
+T:( id 
+T':ε * 
+E':ε + 
+E:id (
+```
+```
+//打印预测分析表
+
+void LLParser::PrintTable();
+```
+```
+
+		$  	    	*   	  	(  	    	id      		)  	    	+  
+F	                          F -> (E)    F -> id      
+T	                          T -> FT'    T -> FT'      
+T'	T' -> ε     T' -> *FT'                                T' -> ε    T' -> ε  
+E'	E' -> ε                                               E' -> ε    E' -> +TE'  
+E	                          E -> TE'    E -> TE'      
+```

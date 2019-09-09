@@ -58,6 +58,7 @@ int main(int argc, const char * argv[]) {
     ll.PrintAllFirst();
     cout<<endl;
     ll.PrintTable();
-    
+    auto i=ll.M();
+    cout<<endl;
     return 0;
 }
