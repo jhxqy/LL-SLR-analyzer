@@ -40,7 +40,7 @@ public:
     void PrintAllFirst();
     void PrintTable();
     JSTR::String2Array<std::string> M();
-    
+    void TableDriveParser(std::vector<std::string>w);
     
 };
 

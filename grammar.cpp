@@ -7,6 +7,7 @@
 //
 
 #include "grammar.hpp"
+#include <stack>
 LLParser::LLParser(const std::string &startSymbol_,std::basic_istream<char> &ss,std::unordered_set<std::string> t):startSymbol(startSymbol_),Terminals(t){
     std::string tmp;
     while (std::getline(ss,tmp)) {
@@ -210,8 +211,9 @@ JSTR::String2Array<std::string> LLParser::M(){
            // std::string Expr=i.first+" -> ";
             std::string Expr;
             for(auto k:j){
-                Expr.append(k);
+                Expr.append(k+" ");
             }
+            Expr.erase(Expr.end()-1);
             for(auto k:firstA){
                 if (!k.compare("ε")) {
                     auto followA=Follow(i.first);
@@ -239,17 +241,6 @@ JSTR::String2Array<std::string> LLParser::M(){
 void LLParser::PrintTable(){
     using namespace std;
     auto m=M();
-//    for(auto i:m.Key2s()){
-//        cout<<"\t\t"<<i<<"  ";
-//    }
-//    cout<<endl;
-//    for(auto i:m.Key1s()){
-//        cout<<i<<"\t";
-//        for(auto j:m.Key2s()){
-//            cout<<m[i][j]<<"  ";
-//        }
-//        cout<<endl;
-//    }
     cout<<"| |";
     for(auto i:m.Key2s()){
         cout<<" "<<i<<"|";
@@ -267,4 +258,39 @@ void LLParser::PrintTable(){
         cout<<endl;
     }
     
+}
+void LLParser::TableDriveParser(std::vector<std::string>w){
+    size_t ip=0;
+    auto table=M();
+    using namespace std;
+    stack<string> stack;
+    stack.push("$");
+    stack.push(startSymbol);
+    while (stack.top().compare("$")) {
+        string X=stack.top();
+        if (!X.compare(w[ip])) {
+            stack.pop();
+            ip++;
+            cout<<"匹配："<<X<<endl;
+            
+            
+        }else if(!table[X][w[ip]].compare("ε")){
+            cout<<X<<"-> ε"<<endl;
+            stack.pop();
+        }else if(Terminals.count(X)){
+            throw std::runtime_error("error!");
+        }else if(table[X][w[ip]].size()==0){
+            throw std::runtime_error("error!");
+        }else{
+            vector<string> v;
+            JSTR::StringUtils::Split(table[X][w[ip]], v,' ');
+            cout<<X<<" -> "<<table[X][w[ip]]<<endl;;
+            stack.pop();
+            for(auto i=v.rbegin();i!=v.rend();i++){
+                stack.push(*i);
+            }
+            
+        }
+    }
+        
 }
