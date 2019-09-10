@@ -75,8 +75,45 @@ void LLParser::PrintTable();
 
 | | $ | * | ( | id | ) | + |
 ----|------|----------|---------|------|------|------|
-F |   |   | F -> (E) | F -> id |  |  
-T |   |   | T -> FT' | T -> FT' |  |  
-T' | T' -> ε  | T' -> *FT'  |  | T' -> ε | T' -> ε |  
-E |   |   | E -> TE' | E -> TE' |  |  
-E' | E' -> ε  |   |  |  | E' -> ε |  E' -> +TE'
+|F |   |   | F -> (E) | F -> id |  |  
+|T |   |   | T -> FT' | T -> FT' |  |  
+|T' | T' -> ε  | T' -> *FT'  |  | T' -> ε | T' -> ε |  
+|E |   |   | E -> TE' | E -> TE' |  |  
+|E' | E' -> ε  |   |  |  | E' -> ε |  E' -> +TE'|
+
+| | $| *| (| id| )| +|
+---|---|---|---|---|---|---|
+F|| | F -> (E)| F -> id| | | 
+T|| | T -> FT'| T -> FT'| | | 
+T'|T' -> ε| T' -> *FT'| | | T' -> ε| T' -> ε| 
+E'|E' -> ε| | | | E' -> ε| E' -> +TE'| 
+E|| | E -> TE'| E -> TE'| | | 
+
+### 文法2
+    
+     RegexList -> Regex RegexList|ε
+     Regex     -> term R'
+     R'        -> + term R'|ε
+     term      -> factor T'
+     T'        -> *|ε
+     factor    -> (RegexList)|STR|CHAR
+
+```cpp
+    ss<<"RegexList -> Regex RegexList | ε"<<endl;
+    ss<<"Regex -> term R'"<<endl;
+    ss<<"R' -> + term R' | ε"<<endl;
+    ss<<"term -> factor T'"<<endl;
+    ss<<"T' -> * | ε"<<endl;
+    ss<<"factor -> ( RegexList ) | STR | CHAR"<<endl;
+```
+
+  预测分析表 
+| | $| *| STR| (| )| +| CHAR|
+---|---|---|---|---|---|---|---|
+T'|T' -> ε| T' -> *| T' -> ε| T' -> ε| T' -> ε| T' -> ε| T' -> ε| 
+factor|| | factor -> STR| factor -> (RegexList)| | | factor -> CHAR| 
+R'|R' -> ε| | R' -> ε| R' -> ε| R' -> ε| R' -> +termR'| R' -> ε| 
+Regex|| | Regex -> termR'| Regex -> termR'| | | Regex -> termR'| 
+term|| | term -> factorT'| term -> factorT'| | | term -> factorT'| 
+RegexList|RegexList -> ε| | RegexList -> RegexRegexList| RegexList -> RegexRegexList| RegexList -> ε| | RegexList -> RegexRegexList|
+    

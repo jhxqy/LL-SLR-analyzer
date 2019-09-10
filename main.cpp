@@ -28,17 +28,12 @@ int main(int argc, const char * argv[]) {
      T'        -> *|ε
      factor    -> (RegexList)|STR|CHAR
      */
-    
-
-    /*
     ss<<"RegexList -> Regex RegexList | ε"<<endl;
     ss<<"Regex -> term R'"<<endl;
     ss<<"R' -> + term R' | ε"<<endl;
     ss<<"term -> factor T'"<<endl;
     ss<<"T' -> * | ε"<<endl;
     ss<<"factor -> ( RegexList ) | STR | CHAR"<<endl;
-     */
-    
     
     /*
      E -> T E'
@@ -47,18 +42,17 @@ int main(int argc, const char * argv[]) {
      T' -> * F T' | ε
      F -> ( E ) | id
      */
-    ss<<"E -> T E'"<<endl;
-    ss<<"E' -> + T E' | ε"<<endl;
-    ss<<"T -> F T'"<<endl;
-    ss<<"T' -> * F T' | ε"<<endl;
-    ss<<"F -> ( E ) | id"<<endl;
-    LLParser ll("E",ss,unordered_set<string>{"ε","id","(",")","*","+"});
+//    ss<<"E -> T E'"<<endl;
+//    ss<<"E' -> + T E' | ε"<<endl;
+//    ss<<"T -> F T'"<<endl;
+//    ss<<"T' -> * F T' | ε"<<endl;
+//    ss<<"F -> ( E ) | id"<<endl;
+    LLParser ll("RegexList",ss,unordered_set<string>{"ε","+","STR","CHAR","(",")","*"});
     ll.PrintAllFollow();
     cout<<endl;
     ll.PrintAllFirst();
     cout<<endl;
     ll.PrintTable();
     auto i=ll.M();
-    cout<<endl;
     return 0;
 }

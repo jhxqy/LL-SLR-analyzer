@@ -238,14 +238,30 @@ JSTR::String2Array<std::string> LLParser::M(){
 void LLParser::PrintTable(){
     using namespace std;
     auto m=M();
+//    for(auto i:m.Key2s()){
+//        cout<<"\t\t"<<i<<"  ";
+//    }
+//    cout<<endl;
+//    for(auto i:m.Key1s()){
+//        cout<<i<<"\t";
+//        for(auto j:m.Key2s()){
+//            cout<<m[i][j]<<"  ";
+//        }
+//        cout<<endl;
+//    }
+    cout<<"| |";
     for(auto i:m.Key2s()){
-        cout<<"\t\t"<<i<<"  ";
+        cout<<" "<<i<<"|";
+    }
+    cout<<endl;
+    for(int i=0;i<m.Key2s().size()+1;i++){
+        cout<<"---|";
     }
     cout<<endl;
     for(auto i:m.Key1s()){
-        cout<<i<<"\t";
+        cout<<i<<"|";
         for(auto j:m.Key2s()){
-            cout<<m[i][j]<<"  ";
+            cout<<m[i][j]<<"| ";
         }
         cout<<endl;
     }
