@@ -15,7 +15,7 @@ LL(1)的文法分析器
 2. 
 
 ## 演示
-### 文法
+### 文法1
  E -> T E
 
  E' -> + T E' | ε 
@@ -102,11 +102,43 @@ E|| | E -> TE'| E -> TE'| | |
   预测分析表 
   
 | | $| *| STR| (| )| +| CHAR|
----|---|---|---|---|---|---|---|
-T'|T' -> ε| T' -> *| T' -> ε| T' -> ε| T' -> ε| T' -> ε| T' -> ε| 
+---|--------|-------|---|---|---|---|---|
+T'| T' -> ε | T' -> * | T' -> ε | T' -> ε| T' -> ε| T' -> ε| T' -> ε| 
 factor|| | factor -> STR| factor -> (RegexList)| | | factor -> CHAR| 
 R'|R' -> ε| | R' -> ε| R' -> ε| R' -> ε| R' -> +termR'| R' -> ε| 
 Regex|| | Regex -> termR'| Regex -> termR'| | | Regex -> termR'| 
 term|| | term -> factorT'| term -> factorT'| | | term -> factorT'| 
 RegexList|RegexList -> ε| | RegexList -> RegexRegexList| RegexList -> RegexRegexList| RegexList -> ε| | RegexList -> RegexRegexList|
-    
+
+
+### 文法3
+
+    S -> array | object
+    array -> [ values ]
+    object -> { members }
+    values -> non-empty-values | ε
+    non-empty-values -> value addition-values
+    addition-values -> ε | , non-empty-values
+    members -> non-empty-members | ε
+    non-empty-members -> member addition-members
+    addition-members -> ε | , non-empty-members
+    member -> STRING : value
+    value -> STRING | NUMBER | NULL | BOOLEAN | object | array
+
+
+预测分析表
+
+
+| | BOOLEAN| :| NULL| NUMBER| $| }| {| ]| ,| [| STRING|
+---|---|---|---|---|---|---|---|---|---|---|---|
+addition-members|| | | | | addition-members -> ε| | | addition-members -> ,non-empty-members| | | 
+non-empty-members|| | | | | | | | | | non-empty-members -> memberaddition-members| 
+addition-values|| | | | | | | addition-values -> ε| addition-values -> ,non-empty-values| | | 
+members|| | | | | members -> ε| | | | | members -> non-empty-members| 
+values|values -> non-empty-values| | values -> non-empty-values| values -> non-empty-values| | | values -> non-empty-values| values -> ε| | values -> non-empty-values| values -> non-empty-values| 
+object|| | | | | | object -> {members}| | | | | 
+member|| | | | | | | | | | member -> STRING:value| 
+value|value -> BOOLEAN| | value -> NULL| value -> NUMBER| | | value -> object| | | value -> array| value -> STRING| 
+non-empty-values|non-empty-values -> valueaddition-values| | non-empty-values -> valueaddition-values| non-empty-values -> valueaddition-values| | | non-empty-values -> valueaddition-values| | | non-empty-values -> valueaddition-values| non-empty-values -> valueaddition-values| 
+array|| | | | | | | | | array -> [values]| | 
+S|| | | | | | S -> object| | | S -> array| | 
