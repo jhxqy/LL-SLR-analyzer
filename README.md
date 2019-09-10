@@ -87,6 +87,34 @@ T'|ε| | | ε| ε| *FT'|
 E'|ε| | | ε| +TE'| | 
 E|| TE'| TE'| | | | 
 
+
+```cpp
+//语法推导过程
+//串 : id + id * id $
+void LLParser::TableDriveParser(std::vector<std::string>w)
+```
+推导结果：
+```
+E -> T E'
+T -> F T'
+F -> id
+匹配：id
+T'-> ε
+E' -> + T E'
+匹配：+
+T -> F T'
+F -> id
+匹配：id
+T' -> * F T'
+匹配：*
+F -> id
+匹配：id
+T'-> ε
+E'-> ε
+```
+
+
+
 ### 文法2
     
      RegexList -> Regex RegexList|ε
