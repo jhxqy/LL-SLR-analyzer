@@ -28,12 +28,12 @@ int main(int argc, const char * argv[]) {
      T'        -> *|ε
      factor    -> (RegexList)|STR|CHAR
      */
-//    ss<<"RegexList -> Regex RegexList | ε"<<endl;
-//    ss<<"Regex -> term R'"<<endl;
-//    ss<<"R' -> + term R' | ε"<<endl;
-//    ss<<"term -> factor T'"<<endl;
-//    ss<<"T' -> * | ε"<<endl;
-//    ss<<"factor -> ( RegexList ) | STR | CHAR"<<endl;
+    ss<<"RegexList -> Regex RegexList | ε"<<endl;
+    ss<<"Regex -> term R'"<<endl;
+    ss<<"R' -> + term R' | ε"<<endl;
+    ss<<"term -> factor T'"<<endl;
+    ss<<"T' -> * | ε"<<endl;
+    ss<<"factor -> ( RegexList ) | STR | CHAR"<<endl;
 //
     /*
      E -> T E'
@@ -60,19 +60,21 @@ int main(int argc, const char * argv[]) {
     member -> STRING : value
     value -> STRING | NUMBER | NULL | BOOLEAN | object | array
 */
-    ss<<"S -> array | object"<<endl;
-    ss<<"array -> [ values ]"<<endl;
-    ss<<"values -> non-empty-values | ε"<<endl;
-    ss<<"object -> { members }"<<endl;
-    ss<<"non-empty-values -> value addition-values"<<endl;
-    ss<<"addition-values -> ε | , non-empty-values"<<endl;
-    ss<<"members -> non-empty-members | ε"<<endl;
-    ss<<"non-empty-members -> member addition-members"<<endl;
-    ss<<"addition-members -> ε | , non-empty-members"<<endl;
-    ss<<"member -> STRING : value"<<endl;
-    ss<<"value -> STRING | NUMBER | NULL | BOOLEAN | object | array"<<endl;
+//    ss<<"S -> array | object"<<endl;
+//    ss<<"array -> [ values ]"<<endl;
+//    ss<<"values -> non-empty-values | ε"<<endl;
+//    ss<<"object -> { members }"<<endl;
+//    ss<<"non-empty-values -> value addition-values"<<endl;
+//    ss<<"addition-values -> ε | , non-empty-values"<<endl;
+//    ss<<"members -> non-empty-members | ε"<<endl;
+//    ss<<"non-empty-members -> member addition-members"<<endl;
+//    ss<<"addition-members -> ε | , non-empty-members"<<endl;
+//    ss<<"member -> STRING : value"<<endl;
+//    ss<<"value -> STRING | NUMBER | NULL | BOOLEAN | object | array"<<endl;
 
-    LLParser ll("S",ss,unordered_set<string>{"ε","[","]","{","}",",",":","STRING","NUMBER","NULL","BOOLEAN",});
+   // LLParser ll("S",ss,unordered_set<string>{"ε","[","]","{","}",",",":","STRING","NUMBER","NULL","BOOLEAN",});
+    //LLParser ll("E",ss,unordered_set<string>{"ε","+","*","(",")","id"});
+    LLParser ll("RegexList",ss,unordered_set<string>{"ε","+","*","(",")","STR","CHAR"});
     ll.PrintAllFollow();
     cout<<endl;
     ll.PrintAllFirst();

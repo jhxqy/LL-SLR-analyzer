@@ -73,13 +73,13 @@ E:id (
 void LLParser::PrintTable();
 ```
 
-| | $| *| (| id| )| +|
+| | $| id| (| )| +| *|
 ---|---|---|---|---|---|---|
-F|| | F -> (E)| F -> id| | | 
-T|| | T -> FT'| T -> FT'| | | 
-T'|T' -> ε| T' -> *FT'| | | T' -> ε| T' -> ε| 
-E'|E' -> ε| | | | E' -> ε| E' -> +TE'| 
-E|| | E -> TE'| E -> TE'| | | 
+F|| id| (E)| | | | 
+T|| FT'| FT'| | | | 
+T'|ε| | | ε| ε| *FT'| 
+E'|ε| | | ε| +TE'| | 
+E|| TE'| TE'| | | | 
 
 ### 文法2
     
@@ -101,14 +101,14 @@ E|| | E -> TE'| E -> TE'| | |
 
   预测分析表 
   
-| | $| *| STR| (| )| +| CHAR|
----|--------|-------|---|---|---|---|---|
-T'| T' -> ε | T' -> * | T' -> ε | T' -> ε| T' -> ε| T' -> ε| T' -> ε| 
-factor|| | factor -> STR| factor -> (RegexList)| | | factor -> CHAR| 
-R'|R' -> ε| | R' -> ε| R' -> ε| R' -> ε| R' -> +termR'| R' -> ε| 
-Regex|| | Regex -> termR'| Regex -> termR'| | | Regex -> termR'| 
-term|| | term -> factorT'| term -> factorT'| | | term -> factorT'| 
-RegexList|RegexList -> ε| | RegexList -> RegexRegexList| RegexList -> RegexRegexList| RegexList -> ε| | RegexList -> RegexRegexList|
+| | $| CHAR| +| )| *| STR| (|
+---|---|---|---|---|---|---|---|
+T'|ε| ε| ε| ε| *| ε| ε| 
+factor|| CHAR| | | | STR| (RegexList)| 
+R'|ε| ε| +termR'| ε| | ε| ε| 
+Regex|| termR'| | | | termR'| termR'| 
+term|| factorT'| | | | factorT'| factorT'| 
+RegexList|ε| RegexRegexList| | ε| | RegexRegexList| RegexRegexList| 
 
 
 ### 文法3
@@ -129,16 +129,17 @@ RegexList|RegexList -> ε| | RegexList -> RegexRegexList| RegexList -> RegexRege
 预测分析表
 
 
+
 | | BOOLEAN| :| NULL| NUMBER| $| }| {| ]| ,| [| STRING|
 ---|---|---|---|---|---|---|---|---|---|---|---|
-addition-members|| | | | | addition-members -> ε| | | addition-members -> ,non-empty-members| | | 
-non-empty-members|| | | | | | | | | | non-empty-members -> memberaddition-members| 
-addition-values|| | | | | | | addition-values -> ε| addition-values -> ,non-empty-values| | | 
-members|| | | | | members -> ε| | | | | members -> non-empty-members| 
-values|values -> non-empty-values| | values -> non-empty-values| values -> non-empty-values| | | values -> non-empty-values| values -> ε| | values -> non-empty-values| values -> non-empty-values| 
-object|| | | | | | object -> {members}| | | | | 
-member|| | | | | | | | | | member -> STRING:value| 
-value|value -> BOOLEAN| | value -> NULL| value -> NUMBER| | | value -> object| | | value -> array| value -> STRING| 
-non-empty-values|non-empty-values -> valueaddition-values| | non-empty-values -> valueaddition-values| non-empty-values -> valueaddition-values| | | non-empty-values -> valueaddition-values| | | non-empty-values -> valueaddition-values| non-empty-values -> valueaddition-values| 
-array|| | | | | | | | | array -> [values]| | 
-S|| | | | | | S -> object| | | S -> array| | 
+addition-members|| | | | | ε| | | ,non-empty-members| | | 
+non-empty-members|| | | | | | | | | | memberaddition-members| 
+addition-values|| | | | | | | ε| ,non-empty-values| | | 
+members|| | | | | ε| | | | | non-empty-members| 
+values|non-empty-values| | non-empty-values| non-empty-values| | | non-empty-values| ε| | non-empty-values| non-empty-values| 
+object|| | | | | | {members}| | | | | 
+member|| | | | | | | | | | STRING:value| 
+value|BOOLEAN| | NULL| NUMBER| | | object| | | array| STRING| 
+non-empty-values|valueaddition-values| | valueaddition-values| valueaddition-values| | | valueaddition-values| | | valueaddition-values| valueaddition-values| 
+array|| | | | | | | | | [values]| | 
+S|| | | | | | object| | | array| | 
