@@ -207,18 +207,18 @@ JSTR::String2Array<std::string> LLParser::M(){
         for(auto j:i.second){
             auto firstA=First(j);
             bool fe=false;
-            bool me=false;
            // std::string Expr=i.first+" -> ";
             std::string Expr;
             for(auto k:j){
                 Expr.append(k+" ");
             }
             Expr.erase(Expr.end()-1);
+            
             for(auto k:firstA){
                 if (!k.compare("ε")) {
                     auto followA=Follow(i.first);
                     for(auto fa:followA){
-                        if(!fa.compare("$")){
+                        if(!fa.compare("$")&&fe){
                             res[i.first]["$"]=Expr;
                         }else{
                             res[i.first][fa]=Expr;

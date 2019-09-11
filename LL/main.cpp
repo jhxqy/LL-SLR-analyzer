@@ -42,11 +42,11 @@ int main(int argc, const char * argv[]) {
      T' -> * F T' | ε
      F -> ( E ) | id
      */
-    ss<<"E -> T E'"<<endl;
-    ss<<"E' -> + T E' | ε"<<endl;
-    ss<<"T -> F T'"<<endl;
-    ss<<"T' -> * F T' | ε"<<endl;
-    ss<<"F -> ( E ) | id"<<endl;
+//    ss<<"E -> T E'"<<endl;
+//    ss<<"E' -> + T E' | ε"<<endl;
+//    ss<<"T -> F T'"<<endl;
+//    ss<<"T' -> * F T' | ε"<<endl;
+//    ss<<"F -> ( E ) | id"<<endl;
 /*
     S -> array | object
     array -> [ values ]
@@ -73,7 +73,7 @@ int main(int argc, const char * argv[]) {
 //    ss<<"value -> STRING | NUMBER | NULL | BOOLEAN | object | array"<<endl;
 
    // LLParser ll("S",ss,unordered_set<string>{"ε","[","]","{","}",",",":","STRING","NUMBER","NULL","BOOLEAN",});
-    LLParser ll("E",ss,unordered_set<string>{"ε","+","*","(",")","id"});
+//    LLParser ll("E",ss,unordered_set<string>{"ε","+","*","(",")","id"});
 //    LLParser ll("RegexList",ss,unordered_set<string>{"ε","+","*","(",")","STR","CHAR"});
 //    ll.PrintAllFollow();
 //    cout<<endl;
@@ -81,8 +81,28 @@ int main(int argc, const char * argv[]) {
 //    cout<<endl;
 //    ll.PrintTable();
 //    auto i=ll.M();
+//    vector<string> v;
+//    JSTR::StringUtils::Split("id + id * id $", v, ' ');
+//    ll.PrintTable();
+//    ll.TableDriveParser(v);
+    
+    
+    
+    
+    ss<<"stmt -> if e then stmt stmtTail | where e do stmt | begin list end | s"<<endl;
+    ss<<"stmtTail -> else stmt | ε"<<endl;
+    ss<<"list -> stmt listTail"<<endl;
+    ss<<"listTail -> ; list | ε"<<endl;
+    
+    LLParser ll("stmt", ss, unordered_set<string>{"ε","if","then","e","s","while","do","begin","end","else",";"});
     vector<string> v;
-    JSTR::StringUtils::Split("id + id * id $", v, ' ');
+    JSTR::StringUtils::Split("if e then s ; if e then s end", v, ' ');
     ll.TableDriveParser(v);
+    
+    ll.PrintTable();
+    
+    
+    
+    
     return 0;
 }
