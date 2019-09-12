@@ -16,7 +16,6 @@
 using namespace std;
 using namespace JSTR;
 
-// @代替
 int main(int argc, const char * argv[]) {
     stringstream ss;
 
