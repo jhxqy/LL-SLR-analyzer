@@ -29,7 +29,7 @@ GeneratingExpr& GeneratingExprPool::Get(int id){
     return  *(data[id]);
 }
 
-LRItem::LRItem(int e,int p):exprId(e),pointPosition(p){
+LRItem::LRItem(int e,int p,GeneratingExprPool &po):exprId(e),pointPosition(p),pool(po){
     
 }
 bool LRItem::operator==(const LRItem& a) const{
@@ -42,8 +42,24 @@ std::size_t LRItemHash::operator()(const LRItem &a) const{
 }
 
 LRCollection LRParser::Closure(const LRCollection &I){
+    
     LRCollection J=I;
-
+    J.collectionId=I.collectionId+1;
+    int count=0;
+    int n=0;
+    do{
+        n=count;
+        for(auto i:J.collection){
+            for(auto j:pr[i.NextExpr()]){
+                LRItem l=LRItem(j,0,pool);
+                if (!J.collection.count(l)) {
+                    J.collection.insert(l);
+                    n++;
+                }
+            }
+        }
+    }while(n!=count);
+    return J;
 }
 
 
@@ -81,4 +97,36 @@ LRParser::LRParser(const std::string &startSymbol_,std::basic_istream<char> &ss,
         }
         
     }
+    
+    pr[startSymbol_+"'"].push_back(pool.CreateExpr(startSymbol_+"'", std::vector<std::string>{startSymbol_}));
+}
+
+LRCollection LRParser::GOTO(const LRCollection &I,const std::string &X){
+    LRCollection J;
+    J.collectionId=I.collectionId+1;
+    for(auto i:I.collection){
+        if(!i.End()&&i.NextExpr().compare(X)==0){
+            LRItem item(i.exprId,i.pointPosition+1,i.pool);
+            J.collection.insert(item);
+        }
+    }
+    return J;
+}
+
+MyTest::MyTest(){
+    using namespace std;
+    stringstream ss;
+    ss<<"E -> E + T | T"<<endl;
+    ss<<"T -> T * F | F"<<endl;
+    ss<<"F -> ( E ) | id"<<endl;
+    
+    LRParser lr("E",ss,unordered_set<std::string>{"(",")","+","*","ε"});
+    LRCollection l1;
+    l1.collectionId=1;
+    l1.collection.insert(LRItem(lr.pr["E'"][0],0,lr.pool));
+    LRCollection l2=lr.Closure(l1);
+    LRCollection l3=lr.GOTO(l2, "E");
+    
+    cout<<"helloworld"<<endl;
+    
 }

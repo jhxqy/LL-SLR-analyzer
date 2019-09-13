@@ -45,10 +45,18 @@ public:
 struct LRItem{
     int exprId;
     int pointPosition;
+    GeneratingExprPool &pool;
 public:
-    LRItem(){}
-    LRItem(int e,int p);
+    LRItem(GeneratingExprPool &po):pool(po){}
+    LRItem(int e,int p,GeneratingExprPool &po);
     bool operator==(const LRItem & a)const;
+    std::string NextExpr(){
+        return pool.Get(exprId).Expr[pointPosition];
+    }
+    bool End(){
+        return !(pointPosition<pool.Get(exprId).Expr.size());
+    }
+    
 };
 
 struct LRItemHash{
@@ -65,6 +73,11 @@ struct LRCollection{
 
 
 
+class MyTest{
+public:
+    MyTest();
+};
+
 
 class LRParser{
     GeneratingExprPool pool;
@@ -72,9 +85,11 @@ class LRParser{
     std::unordered_set<std::string> Terminals;
     std::unordered_set<std::string> nonTerminals;
     std::unordered_map<std::string,std::vector<int>> pr;
-    static LRCollection Closure(const LRCollection &c);
-    
+    friend class MyTest;
 public:
+    LRCollection Closure(const LRCollection &c);
+    LRCollection GOTO(const LRCollection &I,const std::string &X);
+
       LRParser(const std::string &startSymbol_,std::basic_istream<char> &ss,std::unordered_set<std::string> t);
     
 };
