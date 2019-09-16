@@ -68,10 +68,36 @@ struct LRItemHash{
 struct LRCollection{
     int collectionId;
     std::unordered_set<LRItem,LRItemHash> collection;
-    
+    bool operator==(const LRCollection& c) const{
+        for(auto i:collection){
+            if(c.collection.count(i)==0){
+                return false;
+            }
+        }
+        for(auto i:c.collection){
+            if(collection.count(i)==0){
+                return false;
+            }
+        }
+        return true;
+    }
+   
+    static void PrintLRC(const LRCollection &c);
 };
-
-
+struct LRCollectionHash{
+public:
+    size_t operator()(const LRCollection &c) const{
+        int res=0;
+        for(auto i:c.collection){
+            auto h=std::hash<int>();
+            res<<=2;
+            res^=h(i.exprId);
+            res<<=2;
+            res^=h(i.pointPosition);
+        }
+        return res;
+    }
+};
 
 class MyTest{
 public:
@@ -87,6 +113,8 @@ class LRParser{
     std::unordered_map<std::string,std::vector<int>> pr;
     friend class MyTest;
 public:
+    
+    void Items();
     LRCollection Closure(const LRCollection &c);
     LRCollection GOTO(const LRCollection &I,const std::string &X);
 

@@ -8,6 +8,7 @@
 
 #include "LRParser.hpp"
 
+
 GeneratingExprPool::GeneratingExprPool(){}
 
 
@@ -50,18 +51,42 @@ LRCollection LRParser::Closure(const LRCollection &I){
     do{
         n=count;
         for(auto i:J.collection){
-            for(auto j:pr[i.NextExpr()]){
-                LRItem l=LRItem(j,0,pool);
-                if (!J.collection.count(l)) {
-                    J.collection.insert(l);
-                    n++;
+            if (!i.End()) {
+                for(auto j:pr[i.NextExpr()]){
+                    LRItem l=LRItem(j,0,pool);
+                    if (!J.collection.count(l)) {
+                        J.collection.insert(l);
+                        n++;
+                    }
                 }
             }
+            
         }
     }while(n!=count);
     return J;
 }
 
+void LRCollection::PrintLRC(const LRCollection &c){
+    using namespace std;
+    cout<<"id:"<<c.collectionId<<endl;
+    for(auto i:c.collection){
+        string nonTem=i.pool.Get(i.exprId).nonTerminal;
+        cout<<nonTem<<" -> ";
+        vector<string> v=i.pool.Get(i.exprId).Expr;
+        for(size_t j=0;j<v.size();j++){
+            if (j==i.pointPosition) {
+                cout<<". ";
+            }
+            cout<<v[j]<<" ";
+        }
+        if(i.pointPosition==v.size()){
+            cout<<".";
+        }
+        cout<<endl;
+    }
+    cout<<endl;
+
+}
 
 
 LRParser::LRParser(const std::string &startSymbol_,std::basic_istream<char> &ss,std::unordered_set<std::string> t):startSymbol(startSymbol_),Terminals(t){
@@ -120,13 +145,55 @@ MyTest::MyTest(){
     ss<<"T -> T * F | F"<<endl;
     ss<<"F -> ( E ) | id"<<endl;
     
-    LRParser lr("E",ss,unordered_set<std::string>{"(",")","+","*","ε"});
+    LRParser lr("E",ss,unordered_set<std::string>{"(",")","+","*","ε","id"});
     LRCollection l1;
     l1.collectionId=1;
     l1.collection.insert(LRItem(lr.pr["E'"][0],0,lr.pool));
     LRCollection l2=lr.Closure(l1);
     LRCollection l3=lr.GOTO(l2, "E");
+
+    lr.Items();
+}
+
+void LRParser::Items(){
     
-    cout<<"helloworld"<<endl;
-    
+    std::unordered_set<LRCollection,LRCollectionHash> C;
+    LRCollection c1=LRCollection();
+    c1.collectionId=1;
+    c1.collection.insert(LRItem(pr[startSymbol+"'"][0], 0, pool));
+    c1=Closure(c1);
+    C.insert(c1);
+    int count=0;
+    int n=0;
+    do{
+        count=n;
+        for(auto I:C){
+            for(auto X:Terminals){
+                if(!X.compare("ε")){
+                    continue;
+                }
+               // LRCollection::PrintLRC(I);
+                LRCollection tmp=GOTO(I, X);
+                tmp=Closure(tmp);
+              //  LRCollection::PrintLRC(tmp);
+                if (tmp.collection.size()!=0&&C.count(tmp)==0) {
+                    C.insert(tmp);
+                    n++;
+                }
+            }
+            for(auto X:nonTerminals){
+           //     LRCollection::PrintLRC(I);
+                LRCollection tmp=GOTO(I, X);
+                tmp=Closure(tmp);
+          //      LRCollection::PrintLRC(tmp);
+                if (tmp.collection.size()!=0&&C.count(tmp)==0) {
+                    C.insert(tmp);
+                    n++;
+                }
+            }
+        }
+    }while(n!=count);
+    for(auto i:C){
+        LRCollection::PrintLRC(i);
+    }
 }

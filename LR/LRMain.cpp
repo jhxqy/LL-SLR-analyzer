@@ -13,7 +13,6 @@ using namespace std;
 
 int main(){
     MyTest t;
-    cout<<1<<endl;
 
     
 }
