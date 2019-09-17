@@ -26,7 +26,7 @@ class LLParser{
     std::unordered_map<std::string,std::unordered_set<std::string> > firstMap;
     std::unordered_map<std::string,std::unordered_set<std::string>> followMap;
     void _Follow(const std::string &start);
-    std::unordered_set<std::string> _First(const std::string&,std::unordered_map<std::string,std::unordered_set<std::string> > &m);
+    void _First(const std::string&);
 
 public:
     

@@ -59,28 +59,28 @@ int main(int argc, const char * argv[]) {
     member -> STRING : value
     value -> STRING | NUMBER | NULL | BOOLEAN | object | array
 */
-//    ss<<"S -> array | object"<<endl;
-//    ss<<"array -> [ values ]"<<endl;
-//    ss<<"values -> non-empty-values | ε"<<endl;
-//    ss<<"object -> { members }"<<endl;
-//    ss<<"non-empty-values -> value addition-values"<<endl;
-//    ss<<"addition-values -> ε | , non-empty-values"<<endl;
-//    ss<<"members -> non-empty-members | ε"<<endl;
-//    ss<<"non-empty-members -> member addition-members"<<endl;
-//    ss<<"addition-members -> ε | , non-empty-members"<<endl;
-//    ss<<"member -> STRING : value"<<endl;
-//    ss<<"value -> STRING | NUMBER | NULL | BOOLEAN | object | array"<<endl;
+    ss<<"S -> array | object"<<endl;
+    ss<<"array -> [ values ]"<<endl;
+    ss<<"values -> non-empty-values | ε"<<endl;
+    ss<<"object -> { members }"<<endl;
+    ss<<"non-empty-values -> value addition-values"<<endl;
+    ss<<"addition-values -> ε | , non-empty-values"<<endl;
+    ss<<"members -> non-empty-members | ε"<<endl;
+    ss<<"non-empty-members -> member addition-members"<<endl;
+    ss<<"addition-members -> ε | , non-empty-members"<<endl;
+    ss<<"member -> STRING : value"<<endl;
+    ss<<"value -> STRING | NUMBER | NULL | BOOLEAN | object | array"<<endl;
 
-   // LLParser ll("S",ss,unordered_set<string>{"ε","[","]","{","}",",",":","STRING","NUMBER","NULL","BOOLEAN",});
+    LLParser ll("S",ss,unordered_set<string>{"ε","[","]","{","}",",",":","STRING","NUMBER","NULL","BOOLEAN",});
 //    LLParser ll("E",ss,unordered_set<string>{"ε","+","*","(",")","id"});
 //    LLParser ll("RegexList",ss,unordered_set<string>{"ε","+","*","(",")","STR","CHAR"});
-//    ll.PrintAllFollow();
-//    cout<<endl;
-//    ll.PrintAllFirst();
-//    cout<<endl;
-//    ll.PrintTable();
-//    auto i=ll.M();
-//    vector<string> v;
+    ll.PrintAllFollow();
+    cout<<endl;
+    ll.PrintAllFirst();
+    cout<<endl;
+    ll.PrintTable();
+    auto i=ll.M();
+    vector<string> v;
 //    JSTR::StringUtils::Split("id + id * id $", v, ' ');
 //    ll.PrintTable();
 //    ll.TableDriveParser(v);
@@ -101,12 +101,12 @@ int main(int argc, const char * argv[]) {
 //    ll.PrintTable();
 //
     
-    ss<<"S -> L S R S | ε"<<endl;
-    ss<<"L -> ( | E"<<endl;
-    ss<<"R -> ) | E"<<endl;
-    ss<<"E -> * | ε"<<endl;
-    LLParser ll("S",ss,unordered_set<string>{"(",")","*","ε"});
-    ll.PrintTable();
+//    ss<<"S -> L S R S | ε"<<endl;
+//    ss<<"L -> ( | E"<<endl;
+//    ss<<"R -> ) | E"<<endl;
+//    ss<<"E -> * | ε"<<endl;
+//    LLParser ll("S",ss,unordered_set<string>{"(",")","*","ε"});
+//    ll.PrintTable();
     
     return 0;
 }

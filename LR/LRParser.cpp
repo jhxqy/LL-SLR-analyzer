@@ -186,34 +186,6 @@ std::unordered_set<LRCollection,LRCollectionHash> LRParser::Items(){
 
 
 void LRParser::_First(const std::string&X){
-//    std::unordered_set<std::string> res;
-//    if (Terminals.count(X)) {
-//        return std::unordered_set<std::string>{X};
-//    }
-//    for(auto i:pr[X]){
-//        const std::vector<std::string > &expr=pool.Get(i).Expr;
-//        std::unordered_set<std::string> last{"ε"};
-//        if(expr.size()==1&&expr[0]=="ε"){
-//            res.insert("ε");
-//            continue;
-//        }
-//        for(auto v:expr){
-//            if(v.compare(X)==0){
-//                break;
-//            }
-//            if (last.count("ε")) {
-//                std::unordered_set<std::string> current=_First(v);
-//                for(auto k:current){
-//                    res.insert(k);
-//                }
-//                last=current;
-//            }else{
-//                break;
-//            }
-//        }
-//    }
-//    return res;
-    
     for(auto i:Terminals){
         
         firstMap[i]=std::unordered_set<std::string>{i};

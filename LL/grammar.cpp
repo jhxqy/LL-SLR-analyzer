@@ -57,46 +57,72 @@ void printPr(std::unordered_map<std::string,std::vector<std::vector<std::string>
     }
 }
 
-std::unordered_set<std::string> LLParser::_First(const std::string &a,std::unordered_map<std::string,std::unordered_set<std::string> > &m){
-    std::unordered_set<std::string> ret;
-    if (m.count(a)) {
-        return m[a];
+void LLParser::_First(const std::string &a){
+//    std::unordered_set<std::string> ret;
+//    if (m.count(a)) {
+//        return m[a];
+//    }
+//    if (Terminals.count(a)) {
+//        ret.insert(a);
+//        if (!m.count(a)) {
+//            m.insert(std::make_pair(a,ret));
+//        }
+//        return ret;
+//    }
+//    for(auto i:pr[a]){  //遍历每个产生式
+//        bool add=true;
+//
+//        if (i.size()==1&&!i[0].compare("ε")) {
+//            ret.insert("ε");
+//        }
+//        for(auto j:i){
+//            std::unordered_set<std::string> n;
+//            if (add) {
+//                n=_First(j,m);
+//
+//                if (!n.count("ε")) {
+//                    add=false;
+//                }
+//                for(auto k=n.begin();k!=n.end();k++){
+//                    ret.insert(*k);
+//                }
+//            }else{
+//
+//            }
+//        }
+//
+//    }
+//    if (!m.count(a)) {
+//        m.insert(std::make_pair(a,ret));
+//    }
+//    return ret;
+    for(auto i:Terminals){
+        
+        firstMap[i]=std::unordered_set<std::string>{i};
     }
-    if (Terminals.count(a)) {
-        ret.insert(a);
-        if (!m.count(a)) {
-            m.insert(std::make_pair(a,ret));
-        }
-        return ret;
-    }
-    for(auto i:pr[a]){  //遍历每个产生式
-        bool add=true;
-
-        if (i.size()==1&&!i[0].compare("ε")) {
-            ret.insert("ε");
-        }
-        for(auto j:i){
-            std::unordered_set<std::string> n;
-            if (add) {
-                n=_First(j,m);
-                
-                if (!n.count("ε")) {
-                    add=false;
+    for(auto i:nonTerminals){
+        for(auto j:pr[i]){
+            std::unordered_set<std::string> last{"ε"};
+            const std::vector<std::string> &expr=j;
+            if (expr.size()==1&&expr[0].compare("ε")==0){
+                if(firstMap.count(i)==0){
+                    firstMap[i]=std::unordered_set<std::string>();
                 }
-                for(auto k=n.begin();k!=n.end();k++){
-                    ret.insert(*k);
-                }
+                firstMap[i].insert("ε");
             }else{
+                for(auto k:expr){
+                    if(last.count("ε")){
+                        for(auto l:firstMap[k]){
+                            firstMap[i].insert(l);
+                        }
+                    }
+                    last=firstMap[k];
+                }
                 
             }
         }
-
     }
-    if (!m.count(a)) {
-        m.insert(std::make_pair(a,ret));
-    }
-    return ret;
-} 
+}
 std::unordered_set<std::string> LLParser::Follow(const std::string& start){
     static bool finish=false;
     if(finish){
@@ -119,8 +145,24 @@ std::unordered_set<std::string> LLParser::Follow(const std::string& start){
 }
 
 std::unordered_set<std::string> LLParser::First(const std::string& a){
-    auto i=_First(a,firstMap);
-    return i;
+    static bool finish=false;
+    if(finish){
+        return firstMap[a];
+    }
+    int count=0,n=0;
+    for(auto i:firstMap){
+        n+=i.second.size();
+    }
+    do{
+        count=n;
+        _First(startSymbol);
+        n=0;
+        for(auto i:firstMap){
+            n+=i.second.size();
+        }
+    }while(count!=n);
+    finish=true;
+    return First(a);
 }
 std::unordered_set<std::string> LLParser::First(const std::vector<std::string> &v){
     std::unordered_set<std::string> res;
