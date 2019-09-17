@@ -111,10 +111,19 @@ class LRParser{
     std::unordered_set<std::string> Terminals;
     std::unordered_set<std::string> nonTerminals;
     std::unordered_map<std::string,std::vector<int>> pr;
+    std::unordered_map<std::string,std::unordered_set<std::string>> followMap;
+    std::unordered_map<std::string,std::unordered_set<std::string> > firstMap;
+    void _Follow(const std::string &start);
+    void _First(const std::string& start);
+
     friend class MyTest;
+
 public:
     
-    void Items();
+    std::unordered_set<std::string> Follow(const std::string& start);
+    std::unordered_set<std::string> First(const std::string&);
+
+    std::unordered_set<LRCollection,LRCollectionHash> Items();
     LRCollection Closure(const LRCollection &c);
     LRCollection GOTO(const LRCollection &I,const std::string &X);
 

@@ -88,20 +88,25 @@ int main(int argc, const char * argv[]) {
     
     
     
-    ss<<"stmt -> if e then stmt stmtTail | where e do stmt | begin list end | s"<<endl;
-    ss<<"stmtTail -> else stmt | ε"<<endl;
-    ss<<"list -> stmt listTail"<<endl;
-    ss<<"listTail -> ; list | ε"<<endl;
+//    ss<<"stmt -> if e then stmt stmtTail | where e do stmt | begin list end | s"<<endl;
+//    ss<<"stmtTail -> else stmt | ε"<<endl;
+//    ss<<"list -> stmt listTail"<<endl;
+//    ss<<"listTail -> ; list | ε"<<endl;
+//
+//    LLParser ll("stmt", ss, unordered_set<string>{"ε","if","then","e","s","while","do","begin","end","else",";"});
+//    vector<string> v;
+//    JSTR::StringUtils::Split("if e then s ; if e then s end", v, ' ');
+//    ll.TableDriveParser(v);
+//
+//    ll.PrintTable();
+//
     
-    LLParser ll("stmt", ss, unordered_set<string>{"ε","if","then","e","s","while","do","begin","end","else",";"});
-    vector<string> v;
-    JSTR::StringUtils::Split("if e then s ; if e then s end", v, ' ');
-    ll.TableDriveParser(v);
-    
+    ss<<"S -> L S R S | ε"<<endl;
+    ss<<"L -> ( | E"<<endl;
+    ss<<"R -> ) | E"<<endl;
+    ss<<"E -> * | ε"<<endl;
+    LLParser ll("S",ss,unordered_set<string>{"(",")","*","ε"});
     ll.PrintTable();
-    
-    
-    
     
     return 0;
 }

@@ -138,33 +138,18 @@ LRCollection LRParser::GOTO(const LRCollection &I,const std::string &X){
     return J;
 }
 
-MyTest::MyTest(){
-    using namespace std;
-    stringstream ss;
-    ss<<"E -> E + T | T"<<endl;
-    ss<<"T -> T * F | F"<<endl;
-    ss<<"F -> ( E ) | id"<<endl;
-    
-    LRParser lr("E",ss,unordered_set<std::string>{"(",")","+","*","ε","id"});
-    LRCollection l1;
-    l1.collectionId=1;
-    l1.collection.insert(LRItem(lr.pr["E'"][0],0,lr.pool));
-    LRCollection l2=lr.Closure(l1);
-    LRCollection l3=lr.GOTO(l2, "E");
 
-    lr.Items();
-}
-
-void LRParser::Items(){
+std::unordered_set<LRCollection,LRCollectionHash> LRParser::Items(){
     
     std::unordered_set<LRCollection,LRCollectionHash> C;
     LRCollection c1=LRCollection();
-    c1.collectionId=1;
     c1.collection.insert(LRItem(pr[startSymbol+"'"][0], 0, pool));
     c1=Closure(c1);
+    c1.collectionId=0;
     C.insert(c1);
     int count=0;
     int n=0;
+    int id=c1.collectionId+1;
     do{
         count=n;
         for(auto I:C){
@@ -177,6 +162,7 @@ void LRParser::Items(){
                 tmp=Closure(tmp);
               //  LRCollection::PrintLRC(tmp);
                 if (tmp.collection.size()!=0&&C.count(tmp)==0) {
+                    tmp.collectionId=id++;
                     C.insert(tmp);
                     n++;
                 }
@@ -187,13 +173,149 @@ void LRParser::Items(){
                 tmp=Closure(tmp);
           //      LRCollection::PrintLRC(tmp);
                 if (tmp.collection.size()!=0&&C.count(tmp)==0) {
+                    tmp.collectionId=id++;
+
                     C.insert(tmp);
                     n++;
                 }
             }
         }
     }while(n!=count);
-    for(auto i:C){
-        LRCollection::PrintLRC(i);
+    return C;
+}
+
+
+void LRParser::_First(const std::string&X){
+//    std::unordered_set<std::string> res;
+//    if (Terminals.count(X)) {
+//        return std::unordered_set<std::string>{X};
+//    }
+//    for(auto i:pr[X]){
+//        const std::vector<std::string > &expr=pool.Get(i).Expr;
+//        std::unordered_set<std::string> last{"ε"};
+//        if(expr.size()==1&&expr[0]=="ε"){
+//            res.insert("ε");
+//            continue;
+//        }
+//        for(auto v:expr){
+//            if(v.compare(X)==0){
+//                break;
+//            }
+//            if (last.count("ε")) {
+//                std::unordered_set<std::string> current=_First(v);
+//                for(auto k:current){
+//                    res.insert(k);
+//                }
+//                last=current;
+//            }else{
+//                break;
+//            }
+//        }
+//    }
+//    return res;
+    
+    for(auto i:Terminals){
+        
+        firstMap[i]=std::unordered_set<std::string>{i};
     }
+    for(auto i:nonTerminals){
+        for(auto j:pr[i]){
+            std::unordered_set<std::string> last{"ε"};
+            const std::vector<std::string> &expr=pool.Get(j).Expr;
+            if (expr.size()==1&&expr[0].compare("ε")==0){
+                if(firstMap.count(i)==0){
+                    firstMap[i]=std::unordered_set<std::string>();
+                }
+                firstMap[i].insert("ε");
+            }else{
+                for(auto k:expr){
+                    if(last.count("ε")){
+                        for(auto l:firstMap[k]){
+                            firstMap[i].insert(l);
+                        }
+                    }
+                    last=firstMap[k];
+                }
+            
+            }
+        }
+    }
+
+}
+
+std::unordered_set<std::string> LRParser::First(const std::string &start){
+    static bool finish=false;
+    if(finish){
+        return firstMap[start];
+    }
+    int count=0,n=0;
+    for(auto i:firstMap){
+        n+=i.second.size();
+    }
+    do{
+        count=n;
+        _First(startSymbol);
+        n=0;
+        for(auto i:firstMap){
+            n+=i.second.size();
+        }
+    }while(count!=n);
+    finish=true;
+    return First(start);
+}
+
+std::unordered_set<std::string> LRParser::Follow(const std::string &start){
+    static bool finish=false;
+    if(finish){
+        return followMap[start];
+    }
+    int count=0,n=0;
+    for(auto i:followMap){
+        n+=i.second.size();
+    }
+    do{
+        count=n;
+        _Follow(startSymbol);
+        n=0;
+        for(auto i:followMap){
+            n+=i.second.size();
+        }
+    }while(count!=n);
+    finish=true;
+    return Follow(start);
+}
+void LRParser::_Follow(const std::string &start){
+    if (!followMap.count(start)) {
+        followMap.insert(std::make_pair(start,std::unordered_set<std::string>()));
+        followMap[start].insert("$");
+    }
+    for(auto CA:pr){
+        for(auto eachCA:CA.second){
+            const std::vector<std::string> &v=pool.Get(eachCA).Expr;
+            for (int i=0; i<v.size(); i++) {
+                if (nonTerminals.count(v[i])) {
+                    if (i!=v.size()-1) {
+                        for (auto x:First(v[i+1])) {
+                            if (x!="ε") {
+                                followMap[v[i]].insert(x);
+                            }else if(i==v.size()-2){
+                                for(auto c:followMap[CA.first]){
+                                    followMap[v[i]].insert(c);
+                                }
+                            }
+                        }
+                    }else{
+                        for(auto c:followMap[CA.first]){
+                            followMap[v[i]].insert(c);
+                        }
+                    }
+                    
+                }else{
+                    
+                }
+            }
+        }
+    }
+    
+    
 }

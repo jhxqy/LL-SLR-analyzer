@@ -272,8 +272,6 @@ void LLParser::TableDriveParser(std::vector<std::string>w){
             stack.pop();
             ip++;
             cout<<"匹配："<<X<<endl;
-            
-            
         }else if(!table[X][w[ip]].compare("ε")){
             cout<<X<<"-> ε"<<endl;
             stack.pop();
