@@ -139,52 +139,6 @@ LRCollection LRParser::GOTO(const LRCollection &I,const std::string &X){
 }
 
 
-std::unordered_set<LRCollection,LRCollectionHash> LRParser::Items(){
-    
-    std::unordered_set<LRCollection,LRCollectionHash> C;
-    LRCollection c1=LRCollection();
-    c1.collection.insert(LRItem(pr[startSymbol+"'"][0], 0, pool));
-    c1=Closure(c1);
-    c1.collectionId=0;
-    C.insert(c1);
-    int count=0;
-    int n=0;
-    int id=c1.collectionId+1;
-    do{
-        count=n;
-        for(auto I:C){
-            for(auto X:Terminals){
-                if(!X.compare("ε")){
-                    continue;
-                }
-               // LRCollection::PrintLRC(I);
-                LRCollection tmp=GOTO(I, X);
-                tmp=Closure(tmp);
-              //  LRCollection::PrintLRC(tmp);
-                if (tmp.collection.size()!=0&&C.count(tmp)==0) {
-                    tmp.collectionId=id++;
-                    C.insert(tmp);
-                    n++;
-                }
-            }
-            for(auto X:nonTerminals){
-           //     LRCollection::PrintLRC(I);
-                LRCollection tmp=GOTO(I, X);
-                tmp=Closure(tmp);
-          //      LRCollection::PrintLRC(tmp);
-                if (tmp.collection.size()!=0&&C.count(tmp)==0) {
-                    tmp.collectionId=id++;
-
-                    C.insert(tmp);
-                    n++;
-                }
-            }
-        }
-    }while(n!=count);
-    return C;
-}
-
-
 void LRParser::_First(const std::string&X){
     for(auto i:Terminals){
         
@@ -290,4 +244,83 @@ void LRParser::_Follow(const std::string &start){
     }
     
     
+}
+
+
+std::unordered_set<LRCollection,LRCollectionHash> LRParser::Items(){
+    
+    std::unordered_set<LRCollection,LRCollectionHash> C;
+    LRCollection c1=LRCollection();
+    c1.collection.insert(LRItem(pr[startSymbol+"'"][0], 0, pool));
+    c1=Closure(c1);
+    c1.collectionId=0;
+    C.insert(c1);
+    int count=0;
+    int n=0;
+    int id=c1.collectionId+1;
+    do{
+        count=n;
+        for(auto I:C){
+            for(auto X:Terminals){
+                if(!X.compare("ε")){
+                    continue;
+                }
+                // LRCollection::PrintLRC(I);
+                LRCollection tmp=GOTO(I, X);
+                tmp=Closure(tmp);
+                if (tmp.collection.size()!=0&&C.count(tmp)==0) {
+                    tmp.collectionId=id++;
+                    C.insert(tmp);
+                    n++;
+                }
+            }
+            for(auto X:nonTerminals){
+                LRCollection tmp=GOTO(I, X);
+                tmp=Closure(tmp);
+                if (tmp.collection.size()!=0&&C.count(tmp)==0) {
+                    tmp.collectionId=id++;
+                    
+                    C.insert(tmp);
+                    n++;
+                }
+            }
+        }
+    }while(n!=count);
+    return C;
+}
+
+void LRParser::ActionAndGoTo(){
+    std::unordered_set<LRCollection,LRCollectionHash> states=Items();
+    ActionMap am(Sequence(0, int(states.size()-1)),Terminals);
+    GotoMap gm(Sequence(0, int(states.size()-1)),nonTerminals);
+    for(auto i:states){
+        LRCollection::PrintLRC(i);
+    }
+    for(LRCollection lrCollection:states){
+        std::unordered_set<LRItem,LRItemHash> &collection=lrCollection.collection;
+        for(LRItem item:collection){
+            GeneratingExpr &e=pool.Get(item.exprId);
+            if (!item.End()&&Terminals.count(item.NextExpr())) {
+                LRCollection lr=GOTO(lrCollection, item.NextExpr());
+                lr=Closure(lr);
+                auto existedState=states.find(lr);
+                if(existedState!=states.end()){
+                    am[lrCollection.collectionId][item.NextExpr()]=ActionStatus(ActionStatus::Action::SHIFT,existedState->collectionId);
+                }
+            }else if(item.End()&&e.nonTerminal.compare(startSymbol+"'")!=0){
+                for(std::string t:Follow(e.Expr[item.pointPosition-1])){
+                    am[lrCollection.collectionId][t]=ActionStatus(ActionStatus::Action::REDICE,item.exprId);
+                }
+            }else if(item.End()&&e.nonTerminal.compare(startSymbol+"'")==0){
+                am[lrCollection.collectionId]["$"]=ActionStatus(ActionStatus::Action::ACCEPT);
+            }else{
+                LRCollection lr=GOTO(lrCollection, item.NextExpr());
+                lr=Closure(lr);
+                auto existedState=states.find(lr);
+                if(existedState!=states.end()){
+                    gm[lrCollection.collectionId][item.NextExpr()]=existedState->collectionId;
+                }
+            }
+        }
+    }
 }

@@ -16,6 +16,7 @@
 #include <unordered_map>
 #include <string>
 #include <map>
+#include "SLRUtils.hpp"
 class GeneratingExpr{
     
 public:
@@ -126,7 +127,7 @@ public:
     std::unordered_set<LRCollection,LRCollectionHash> Items();
     LRCollection Closure(const LRCollection &c);
     LRCollection GOTO(const LRCollection &I,const std::string &X);
-
+    void ActionAndGoTo();
       LRParser(const std::string &startSymbol_,std::basic_istream<char> &ss,std::unordered_set<std::string> t);
     
 };

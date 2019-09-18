@@ -16,25 +16,7 @@ MyTest::MyTest(){
     ss<<"F -> ( E ) | id"<<endl;
     
     LRParser lr("E",ss,unordered_set<std::string>{"(",")","+","*","ε","id"});
-//    LRCollection l1;
-//    auto C=lr.Items();
-//    for(auto i:C){
-//        LRCollection::PrintLRC(i);
-//    }
-    for(auto i:lr.nonTerminals){
-        cout<<i<<": ";
-        for(auto j:lr.First(i)){
-            cout<<j<<" ";
-        }
-        cout<<endl;
-    }
-    
-    for(auto i:lr.nonTerminals){
-        cout<<i<<": ";
-        for(auto j:lr.Follow(i)){
-            cout<<j<<" ";
-        }
-        cout<<endl;
-    }
+    lr.ActionAndGoTo();
+
     
 }
