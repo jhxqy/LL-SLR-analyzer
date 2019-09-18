@@ -124,10 +124,10 @@ public:
     std::unordered_set<std::string> Follow(const std::string& start);
     std::unordered_set<std::string> First(const std::string&);
 
-    std::unordered_set<LRCollection,LRCollectionHash> Items();
+    std::unordered_set<LRCollection,LRCollectionHash> Items();t
     LRCollection Closure(const LRCollection &c);
     LRCollection GOTO(const LRCollection &I,const std::string &X);
-    void ActionAndGoTo();
+    void ActionAndGoto();
       LRParser(const std::string &startSymbol_,std::basic_istream<char> &ss,std::unordered_set<std::string> t);
     
 };

@@ -289,9 +289,12 @@ std::unordered_set<LRCollection,LRCollectionHash> LRParser::Items(){
     return C;
 }
 
-void LRParser::ActionAndGoTo(){
+void LRParser::ActionAndGoto(){
     std::unordered_set<LRCollection,LRCollectionHash> states=Items();
-    ActionMap am(Sequence(0, int(states.size()-1)),Terminals);
+    auto T=Terminals;
+    T.insert("$");
+    ActionMap am(Sequence(0, int(states.size()-1)),T);
+
     GotoMap gm(Sequence(0, int(states.size()-1)),nonTerminals);
     for(auto i:states){
         LRCollection::PrintLRC(i);
@@ -308,7 +311,10 @@ void LRParser::ActionAndGoTo(){
                     am[lrCollection.collectionId][item.NextExpr()]=ActionStatus(ActionStatus::Action::SHIFT,existedState->collectionId);
                 }
             }else if(item.End()&&e.nonTerminal.compare(startSymbol+"'")!=0){
-                for(std::string t:Follow(e.Expr[item.pointPosition-1])){
+//                if(lrCollection.collectionId==11){
+//                    std::cout<<"1"<<std::endl;
+//                }
+                for(std::string t:Follow(e.nonTerminal)){
                     am[lrCollection.collectionId][t]=ActionStatus(ActionStatus::Action::REDICE,item.exprId);
                 }
             }else if(item.End()&&e.nonTerminal.compare(startSymbol+"'")==0){
@@ -323,4 +329,7 @@ void LRParser::ActionAndGoTo(){
             }
         }
     }
+    am.printTable();
+    std::cout<<std::endl;
+    gm.printTable();
 }

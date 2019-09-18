@@ -14,9 +14,9 @@ MyTest::MyTest(){
     ss<<"E -> E + T | T"<<endl;
     ss<<"T -> T * F | F"<<endl;
     ss<<"F -> ( E ) | id"<<endl;
-    
     LRParser lr("E",ss,unordered_set<std::string>{"(",")","+","*","ε","id"});
-    lr.ActionAndGoTo();
+    
+    lr.ActionAndGoto();
 
     
 }
