@@ -57,6 +57,11 @@ public:
     bool End(){
         return !(pointPosition<pool.Get(exprId).Expr.size());
     }
+    LRItem&  operator=(const LRItem &l){
+        this->exprId=l.exprId;
+        this->pointPosition=l.pointPosition;
+        return *this;
+    }
     
 };
 
@@ -82,7 +87,11 @@ struct LRCollection{
         }
         return true;
     }
-   
+    LRCollection& operator=(const LRCollection&l){
+        this->collectionId=l.collectionId;
+        this->collection=l.collection;
+        return *this;
+    }
     static void PrintLRC(const LRCollection &c);
 };
 struct LRCollectionHash{
@@ -124,12 +133,12 @@ public:
     std::unordered_set<std::string> Follow(const std::string& start);
     std::unordered_set<std::string> First(const std::string&);
 
-    std::unordered_set<LRCollection,LRCollectionHash> Items();t
+    std::unordered_set<LRCollection,LRCollectionHash> Items();
     LRCollection Closure(const LRCollection &c);
     LRCollection GOTO(const LRCollection &I,const std::string &X);
-    void ActionAndGoto();
+    std::pair<ActionMap, GotoMap>  ActionAndGoto();
       LRParser(const std::string &startSymbol_,std::basic_istream<char> &ss,std::unordered_set<std::string> t);
-    
+    void Parse(const std::string &w);
 };
 
 

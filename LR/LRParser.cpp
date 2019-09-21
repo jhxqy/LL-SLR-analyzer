@@ -7,7 +7,7 @@
 //
 
 #include "LRParser.hpp"
-
+#include <stack>
 
 GeneratingExprPool::GeneratingExprPool(){}
 
@@ -289,16 +289,16 @@ std::unordered_set<LRCollection,LRCollectionHash> LRParser::Items(){
     return C;
 }
 
-void LRParser::ActionAndGoto(){
+std::pair<ActionMap, GotoMap> LRParser::ActionAndGoto(){
     std::unordered_set<LRCollection,LRCollectionHash> states=Items();
     auto T=Terminals;
     T.insert("$");
     ActionMap am(Sequence(0, int(states.size()-1)),T);
-
+ 
     GotoMap gm(Sequence(0, int(states.size()-1)),nonTerminals);
-    for(auto i:states){
-        LRCollection::PrintLRC(i);
-    }
+//    for(auto i:states){
+//        LRCollection::PrintLRC(i);
+//    }
     for(LRCollection lrCollection:states){
         std::unordered_set<LRItem,LRItemHash> &collection=lrCollection.collection;
         for(LRItem item:collection){
@@ -329,7 +329,67 @@ void LRParser::ActionAndGoto(){
             }
         }
     }
-    am.printTable();
-    std::cout<<std::endl;
-    gm.printTable();
+//    am.printTable();
+//    std::cout<<std::endl;
+//    gm.printTable();
+    return std::make_pair(am, gm);
+}
+
+void LRParser::Parse(const std::string &w){
+    std::unordered_set<LRCollection,LRCollectionHash> states=Items();
+    auto pair=ActionAndGoto();
+    ActionMap ACTION=pair.first;
+    GotoMap GOTO=pair.second;
+    LRCollection start;
+    for(auto s:states){
+        bool f=false;
+        for(auto i:s.collection){
+            if(i.exprId==pr[startSymbol+"'"][0]&&i.pointPosition==0){
+                f=true;
+                start=s;
+                break;
+            }
+        }
+        if(f){
+            break;
+        }
+    }
+    
+    std::stack<int> stack;
+    stack.push(start.collectionId);   //初始化初始状态-1
+    std::vector<std::string> inputBuf;
+    JSTR::StringUtils::Split(w, inputBuf, ' ');
+    inputBuf.push_back("$");
+    int a=0;
+    while (1) {
+        int s=stack.top();
+        ActionStatus state=ACTION[s][inputBuf[a]];
+        if(state.a==ActionStatus::Action::SHIFT){
+            stack.push(state.shiftTo);
+            a++;
+        }else if(state.a==ActionStatus::Action::REDICE){
+            std::vector<std::string> rediceExpr=pool.Get(state.exprID).Expr;
+            int RediceNumber=(int)rediceExpr.size();
+            while (RediceNumber--) {
+                stack.pop();
+            }
+            int t=stack.top();
+            stack.push(GOTO[t][pool.Get(state.exprID).nonTerminal]);
+            std::cout<<pool.Get(state.exprID).nonTerminal<<" -> ";
+            for(auto i:rediceExpr){
+                std::cout<<i<<" ";
+            }
+            std::cout<<std::endl;
+            
+        }else if(state.a==ActionStatus::Action::ACCEPT){
+            std::cout<<"Accept！"<<std::endl;
+            break;
+        }else {
+            throw std::runtime_error("parse error!");
+        }
+    }
+    
+
+    
+    
 }
